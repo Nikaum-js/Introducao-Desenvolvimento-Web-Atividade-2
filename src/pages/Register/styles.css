@@ -45,6 +45,27 @@ section {
   margin-bottom: 10px;
 }
 
+.error {
+  border: 1px solid #DA4848 !important;
+}
+
+.terms {
+  width: 400px;
+  height: 50px;
+
+  color: #373252;
+  font-size: 16px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.terms input {
+  margin-left: 10px;
+
+}
+
 .content-input input {
   border: 0;
   background-color: #FCFCFF;
