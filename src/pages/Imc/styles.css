@@ -1,0 +1,109 @@
+main {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: 80vh;
+}
+
+section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+
+  margin-top: 50px;
+  width: 1100px;
+  height: 550px;
+}
+
+section p {
+  text-align: justify; 
+  width: 500px;
+  margin-top: 40px;
+}
+
+section h2 {
+  color: #373252;
+  font-weight: 500;
+  font-size: 26px;
+}
+
+section h1 {
+  color: #373252;
+  font-weight: 700;
+  font-size: 32px;
+}
+
+article {
+  height: 100%;
+  width: 45%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+article h1 {
+  margin-bottom: 40px;
+}
+
+article button {
+  background-color: #6B5BD4;
+  width: 120px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+
+  border: 0;
+}
+
+.inputs-content {
+  margin: 20px 0;
+  display: flex;
+}
+
+.content-input {
+  margin: 0 2px;
+}
+
+.content-input input {
+  border: 0;
+  background-color: #FCFCFF;
+  border: 1px solid #E6E6F0;
+  border-radius: 8px;
+
+  color: #373252;
+  font-size: 16px;
+  padding-left: 20px;
+
+  outline: none;
+
+  width: 260px;
+  height: 55px;
+}
+
+.content-input input::placeholder {
+  font-size: 14px;
+}
+
+table {
+  border: 0;
+  text-align: center;
+  margin-top: 40px;
+}
+
+table th {
+  border: 1px solid #E6E6F0;
+  padding: 15px;
+
+  color: #373252;
+  font-size: 16px;
+}

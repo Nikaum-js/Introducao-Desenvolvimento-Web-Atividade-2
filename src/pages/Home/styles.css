@@ -1,0 +1,64 @@
+iframe {
+  width: 600px;
+  height: 450px;
+  border: 0;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  width: 100%;
+}
+
+section h1 {
+  margin-bottom: 80px;
+  color: #373252;
+  font-weight: 700;
+  font-size: 32px;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+
+  margin-top: 80px;
+
+  width: 1100px;
+  height: 550px;
+}
+
+.content-left {
+  display: flex;
+
+  margin-top: 180px;
+  width: 70%;
+  justify-content: space-between;
+  margin-bottom: 120px;
+}
+
+.information h2 {
+  color: #373252;
+  font-size: 32px;
+  line-height: 24px;
+
+  margin: 60px 0 30px 0;
+}
+
+.information p {
+  font-size: 18px;
+}
+
+.information ul li {
+  margin: 13px 0;
+  font-size: 18px;
+}
+
+.content-left img {
+  width: 500px;
+  height: 500px;
+}

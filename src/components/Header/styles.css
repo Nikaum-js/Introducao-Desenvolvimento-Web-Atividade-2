@@ -1,0 +1,47 @@
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  
+  padding: 0 140px;
+  height: 140px;
+  background-color: #6B5BD4;
+}
+
+header h1 {
+  color: #fff;
+}
+
+header h1 strong {
+  color: #5BD391;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+}
+
+nav ul li {
+  margin: 0 30px;
+
+  font-size: 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+
+  transition: all 0.2;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #fff;
+}
+
+nav ul li:hover {
+  transform: scale(1.1);
+}
