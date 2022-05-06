@@ -158,3 +158,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .attention h2 {
   margin-left: 16px;
 }
+
+.error-message {
+  position: relative;
+  top: -25px;
+  color: #373252;
+  font-size: 14px;
+}
