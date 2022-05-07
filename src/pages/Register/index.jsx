@@ -10,6 +10,18 @@ import "./styles.css";
 export function Register() {
   const { register, handleSubmit } = useForm();
   const [errors, setErrors] = useState({ nomeCompleto: [] });
+  const [fieldErrors, setFieldErrors] = useState({
+    name:'',
+    email:'',
+    birth:'',
+    gender:'',
+    cpf:'',
+    cep:'',
+    logradouro:'',
+    numeroLogradouro:'',
+    city:'',
+    uf:'',
+  });
 
   // useEffect(() => {
   //   //seleciona o cep
@@ -50,31 +62,34 @@ export function Register() {
   //   });
   // }, []);
 
-  async function handleSubmitForm(data) {
-    try {
-      api
-        .post("cadastro", data)
-        .then((response) => {
-          toast.success(response.data.message);
-
-          setTimeout(() => {
-            window.location.reload();
-          }, "4000");
+  function handleSubmitForm(data) {
+    api.post("cadastro", data)
+      .then((response) => {
+        toast.success(response.data.message);
+    })
+    .catch((res) => {
+      let errors = {};
+      if (res.response.status === 422) {
+        setFieldErrors({
+          name: res.response.data.errors.nomeCompleto,
+          email: res.response.data.errors.email,
+          birth: res.response.data.errors.dataNascimento,
+          gender: res.response.data.errors.sexo,
+          cpf: res.response.data.errors.cpf,
+          cep: res.response.data.errors.cep,
+          logradouro: res.response.data.errors.logradouro,
+          numeroLogradouro: res.response.data.errors.numeroLogradouro,
+          city: res.response.data.errors.cidade,
+          uf: res.response.data.errors.uf,
         })
-        .catch((resp) => {
-          const response = resp.response;
-          let errors = {};
-          if (response.status === 422) {
-            Object.keys(response.data.errors).forEach((el) => {
-              errors = { ...errors, [el[0]]: [el[1]] };
-            });
-          } else if (response.response.status === 412) {
-            console.log("response 412");
-          }
-        });
-    } catch (err) {
-      toast.error("Erro ao criar o cadastro!");
-    }
+        toast.error("erro ao criar cadastro, verifique os campos!");
+        // Object.keys(res.response.data.errors).forEach((el) => {
+        //   errors = { ...errors, [el[0]]: [el[1]] };
+        // });
+      } else if (res.response.status === 412) {
+        toast.error(res.response.data.message);
+      }
+    });
   }
 
   return (
@@ -89,43 +104,52 @@ export function Register() {
             <div class="content-input">
               <label for="">Nome Completo</label>
               <input
-                className={errors.nomeCompleto ? "error" : ""}
+                className={fieldErrors.name === undefined ? "" : "error"}
                 type="text"
                 placeholder="Nome Completo"
                 {...register("nomeCompleto")}
               />
-              {errors.nomeCompleto ? (
+              {fieldErrors.name === undefined ? (
                 <p className="error-message">
-                  O campo "nome completo" não pode ter menos de 5 caracteres.
                 </p>
               ) : (
-                ""
+                <p className="error-message">
+                  {fieldErrors.name}
+                </p>
               )}
             </div>
 
             <div class="content-input">
               <label for="">E-mail</label>
               <input
-                className={errors.nomeCompleto ? "error" : ""}
+                className={fieldErrors.email === undefined ? "" : "error"}
                 type="text"
                 placeholder="E-mail"
                 {...register("email")}
               />
+              {fieldErrors.email === undefined ? (
+                <p className="error-message"></p>
+              ) : (
+                <p className="error-message">
+                  {fieldErrors.uf}
+                </p>
+              )}
             </div>
 
             <div class="content-input">
               <label for="">Data de Nascimento</label>
               <input
-                className={errors.nomeCompleto ? "error" : ""}
+                className={fieldErrors.birth === undefined ? "" : "error"}
                 type="date"
                 {...register("dataNascimento")}
               />
-              {errors.nomeCompleto ? (
+              {fieldErrors.birth === undefined ? (
                 <p className="error-message">
-                  O campo "data nascimento" é requerido.
                 </p>
               ) : (
-                ""
+                <p className="error-message">
+                  {fieldErrors.birth}
+                </p>
               )}
             </div>
 
@@ -134,7 +158,7 @@ export function Register() {
               <select
                 name=""
                 id=""
-                className={errors.nomeCompleto ? "error" : ""}
+                className={fieldErrors.gender === undefined ? "" : "error"}
                 {...register("sexo")}
               >
                 <option value="" selected>
@@ -143,28 +167,31 @@ export function Register() {
                 <option value="M">Masculino</option>
                 <option value="F">Feminino</option>
               </select>
-              {errors.nomeCompleto ? (
-                <p className="error-message">O campo "sexo" é requerido.</p>
+              {fieldErrors.gender === undefined ? (
+                <p className="error-message"></p>
               ) : (
-                ""
+                <p className="error-message">
+                  {fieldErrors.gender}
+                </p>
               )}
             </div>
 
             <div class="content-input">
               <label for="">CPF</label>
               <input
-                className={errors.nomeCompleto ? "error" : ""}
+                className={fieldErrors.cpf === undefined ? "" : "error"}
                 type="number"
                 placeholder="CPF"
                 data-mask="000.000.000-00"
                 {...register("cpf")}
               />
-              {errors.nomeCompleto ? (
+              {fieldErrors.cpf ? (
                 <p className="error-message">
-                  O campo "cpf" tem que ter 11 caracteres.
                 </p>
               ) : (
-                ""
+                <p className="error-message">
+                  {fieldErrors.cpf}
+                </p>
               )}
             </div>
           </div>
@@ -174,65 +201,70 @@ export function Register() {
               <label htmlFor="cep">CEP</label>
               <input
                 id="cep"
-                className={errors.nomeCompleto ? "error" : ""}
+                className={fieldErrors.cep === undefined ? "" : "error"}
                 type="text"
                 placeholder="CEP"
                 {...register("cep")}
               />
-              {errors.nomeCompleto ? (
+              {fieldErrors.cep === undefined ? (
                 <p className="error-message">
-                  O campo "cep" tem que ter 8 caracteres.
                 </p>
               ) : (
-                ""
+                <p className="error-message">
+                  {fieldErrors.cep}
+                </p>
               )}
             </div>
             <div htmlFor="logradouro" class="content-input">
               <label for="">Logradouro</label>
               <input
                 id="logradouro"
-                className={errors.nomeCompleto ? "error" : ""}
+                className={fieldErrors.logradouro === undefined ? "" : "error"}
                 type="text"
                 placeholder="Logradouro"
                 {...register("logradouro")}
               />
-              {errors.nomeCompleto ? (
+              {fieldErrors.logradouro === undefined ? (
                 <p className="error-message">
-                  O campo "logradouro" é requerido.
                 </p>
               ) : (
-                ""
+                <p className="error-message">
+                  {fieldErrors.logradouro}
+                </p>
               )}
             </div>
             <div class="content-input">
               <label for="">Número</label>
               <input
-                className={errors.nomeCompleto ? "error" : ""}
+                className={fieldErrors.numeroLogradouro === undefined ? "" : "error"}
                 type="text"
                 placeholder="Número"
                 {...register("numeroLogradouro")}
               />
-              {errors.nomeCompleto ? (
+              {fieldErrors.numeroLogradouro === undefined ? (
                 <p className="error-message">
-                  O campo "numero logradouro" é requerido.
                 </p>
               ) : (
-                ""
+                <p className="error-message">
+                  {fieldErrors.numeroLogradouro}
+                </p>
               )}
             </div>
             <div class="content-input">
               <label htmlFor="localidade">Cidade</label>
               <input
                 id="localidade"
-                className={errors.nomeCompleto ? "error" : ""}
+                className={fieldErrors.city === undefined ? "" : "error"}
                 type="text"
                 placeholder="Cidade"
                 {...register("cidade")}
               />
-              {errors.nomeCompleto ? (
-                <p className="error-message">O campo "cidade" é requerido.</p>
+              {fieldErrors.city === undefined ? (
+                <p className="error-message"></p>
               ) : (
-                ""
+                <p className="error-message">
+                  {fieldErrors.city}
+                </p>
               )}
             </div>
 
@@ -240,21 +272,22 @@ export function Register() {
               <label htmlFor="uf">UF</label>
               <input
                 id="uf"
-                className={errors.nomeCompleto ? "error" : ""}
+                className={fieldErrors.uf === undefined ? "" : "error"}
                 type="text"
                 placeholder="UF"
                 {...register("uf")}
               />
-              {errors.nomeCompleto ? (
-                <p className="error-message">O campo "uf" é requerido.</p>
+              {fieldErrors.uf === undefined ? (
+                <p className="error-message"></p>
               ) : (
-                ""
+                <p className="error-message">
+                  {fieldErrors.uf}
+                </p>
               )}
             </div>
             <div class="content-input">
               <label for="">Expectativa</label>
               <input
-                className={errors.nomeCompleto ? "error" : ""}
                 type="text"
                 placeholder="Expectativa"
                 {...register("expectativa")}
