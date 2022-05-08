@@ -11,16 +11,16 @@ export function Register() {
   const { register, handleSubmit } = useForm();
   const [errors, setErrors] = useState({ nomeCompleto: [] });
   const [fieldErrors, setFieldErrors] = useState({
-    name:'',
-    email:'',
-    birth:'',
-    gender:'',
-    cpf:'',
-    cep:'',
-    logradouro:'',
-    numeroLogradouro:'',
-    city:'',
-    uf:'',
+    name:undefined,
+    email:undefined,
+    birth:undefined,
+    gender:undefined,
+    cpf:undefined,
+    cep:undefined,
+    logradouro:undefined,
+    numeroLogradouro:undefined,
+    city:undefined,
+    uf:undefined,
   });
 
   // useEffect(() => {
