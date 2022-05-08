@@ -9,94 +9,100 @@ import "./styles.css";
 
 export function Register() {
   const { register, handleSubmit } = useForm();
-  const [errors, setErrors] = useState({ nomeCompleto: [] });
   const [fieldErrors, setFieldErrors] = useState({
-    name:undefined,
-    email:undefined,
-    birth:undefined,
-    gender:undefined,
-    cpf:undefined,
-    cep:undefined,
-    logradouro:undefined,
-    numeroLogradouro:undefined,
-    city:undefined,
-    uf:undefined,
+    name: undefined,
+    email: undefined,
+    birth: undefined,
+    gender: undefined,
+    cpf: undefined,
+    cep: undefined,
+    logradouro: undefined,
+    numeroLogradouro: undefined,
+    city: undefined,
+    uf: undefined,
   });
-  const [verifiedTerms, setVerifiedTerms] = useState()
-
-  // useEffect(() => {
-  //   //seleciona o cep
-  //   const cep = document.querySelector("#cep");
-
-  //   //percorre o json enviado pela API e separa apenas a parte que me importa
-  //   const showData = (result) => {
-  //     for (const campo in result) {
-  //       if (document.querySelector("#" + campo)) {
-  //         document.querySelector("#" + campo).value = result[campo];
-  //       }
-  //     }
-  //   };
-
-  //   //função para pegar o campo enviado pelo input e colocar ele na API dos correios
-  //   cep.addEventListener("blur", (e) => {
-  //     //função para encontrar o "-" caso encontrar troque por vazio
-  //     let searchTrace;
-
-  //     //regras que eu defini para o fetch
-  //     const options = {
-  //       method: "GET",
-  //       mode: "cors",
-  //       cache: "default",
-  //     };
-
-  //     //estou enviando os dados para a API dos correios
-  //     fetch(`https://viacep.com.br/ws/${searchTrace}/json`, options)
-  //       //estou dizendo o que eu quero fazer com a minha promise
-  //       .then((response) => {
-  //         response
-  //           .json()
-  //           //estou dizendo o que eu quero fazer com a minha outra promise
-  //           .then((data) => showData(data));
-  //       })
-  //       //caso dê errado eu quero que ele mostre uma mensagem com o erro encontrado
-  //       .catch((e) => console.log("Deu um tal erro" + e));
-  //   });
-  // }, []);
+  const [verifiedTerms, setVerifiedTerms] = useState();
 
   useEffect(() => {
-    console.log(verifiedTerms)
-  }, [verifiedTerms])
-  
+    const cep = document.querySelector("#cep");
+
+    //percorre o json enviado pela API e separa apenas a parte que me importa
+    const showData = (result) => {
+      for (const campo in result) {
+        if (document.querySelector("#" + campo)) {
+          document.querySelector("#" + campo).value = result[campo];
+        }
+      }
+    };
+
+    //função para pegar o campo enviado pelo input e colocar ele na API dos correios
+    cep.addEventListener("blur", (e) => {
+      //função para encontrar o "-" caso encontrar troque por vazio
+      let searchTrace = cep.value.replace("-", "");
+
+      //regras que eu defini para o fetch
+      const options = {
+        method: "GET",
+        mode: "cors",
+        cache: "default",
+      };
+
+      //estou enviando os dados para a API dos correios
+      fetch(`https://viacep.com.br/ws/${searchTrace}/json`, options)
+        //estou dizendo o que eu quero fazer com a minha promise
+        .then((response) => {
+          response
+            .json()
+            //estou dizendo o que eu quero fazer com a minha outra promise
+            .then((data) => showData(data));
+        })
+        //caso dê errado eu quero que ele mostre uma mensagem com o erro encontrado
+        .catch((e) => console.log("Deu um tal erro" + e));
+    });
+  }, []);
+
+  useEffect(() => {
+    console.log(verifiedTerms);
+  }, [verifiedTerms]);
 
   function handleSubmitForm(data) {
-    if ( verifiedTerms ) {
-      api.post("cadastro", data)
+    if (verifiedTerms) {
+      api
+        .post("cadastro", data)
         .then((response) => {
           toast.success(response.data.message);
-      })
-      .catch((res) => {
-        let errors = {};
-        if (res.response.status === 422) {
-          setFieldErrors({
-            name: res.response.data.errors.nomeCompleto,
-            email: res.response.data.errors.email,
-            birth: res.response.data.errors.dataNascimento,
-            gender: res.response.data.errors.sexo,
-            cpf: res.response.data.errors.cpf,
-            cep: res.response.data.errors.cep,
-            logradouro: res.response.data.errors.logradouro,
-            numeroLogradouro: res.response.data.errors.numeroLogradouro,
-            city: res.response.data.errors.cidade,
-            uf: res.response.data.errors.uf,
-          })
-          toast.error("erro ao criar cadastro, verifique os campos!");
-          // Object.keys(res.response.data.errors).forEach((el) => {
-          //   errors = { ...errors, [el[0]]: [el[1]] };
-          // });
-        } else if (res.response.status === 412) {
-          toast.error(res.response.data.message);
-        }
-      });
+        })
+        .catch((res) => {
+          if (res.response.status === 422) {
+            setFieldErrors({
+              name: res.response.data.errors.nomeCompleto,
+              email: res.response.data.errors.email,
+              birth: res.response.data.errors.dataNascimento,
+              gender: res.response.data.errors.sexo,
+              cpf: res.response.data.errors.cpf,
+              cep: res.response.data.errors.cep,
+              logradouro: res.response.data.errors.logradouro,
+              numeroLogradouro: res.response.data.errors.numeroLogradouro,
+              city: res.response.data.errors.cidade,
+              uf: res.response.data.errors.uf,
+            });
+            toast.error("erro ao criar cadastro, verifique os campos!");
+          } else if (res.response.status === 412) {
+            toast.success(res.response.data.message);
+            setFieldErrors({
+              name: undefined,
+              email: undefined,
+              birth: undefined,
+              gender: undefined,
+              cpf: undefined,
+              cep: undefined,
+              logradouro: undefined,
+              numeroLogradouro: undefined,
+              city: undefined,
+              uf: undefined,
+            });
+          }
+        });
     } else {
       toast.error("marque o campo de termos e condições");
     }
@@ -120,12 +126,9 @@ export function Register() {
                 {...register("nomeCompleto")}
               />
               {fieldErrors.name === undefined ? (
-                <p className="error-message">
-                </p>
+                <p className="error-message"></p>
               ) : (
-                <p className="error-message">
-                  {fieldErrors.name}
-                </p>
+                <p className="error-message">{fieldErrors.name}</p>
               )}
             </div>
 
@@ -140,9 +143,7 @@ export function Register() {
               {fieldErrors.email === undefined ? (
                 <p className="error-message"></p>
               ) : (
-                <p className="error-message">
-                  {fieldErrors.uf}
-                </p>
+                <p className="error-message">{fieldErrors.email}</p>
               )}
             </div>
 
@@ -154,12 +155,9 @@ export function Register() {
                 {...register("dataNascimento")}
               />
               {fieldErrors.birth === undefined ? (
-                <p className="error-message">
-                </p>
+                <p className="error-message"></p>
               ) : (
-                <p className="error-message">
-                  {fieldErrors.birth}
-                </p>
+                <p className="error-message">{fieldErrors.birth}</p>
               )}
             </div>
 
@@ -180,9 +178,7 @@ export function Register() {
               {fieldErrors.gender === undefined ? (
                 <p className="error-message"></p>
               ) : (
-                <p className="error-message">
-                  {fieldErrors.gender}
-                </p>
+                <p className="error-message">{fieldErrors.gender}</p>
               )}
             </div>
 
@@ -195,13 +191,10 @@ export function Register() {
                 data-mask="000.000.000-00"
                 {...register("cpf")}
               />
-              {fieldErrors.cpf ? (
-                <p className="error-message">
-                </p>
+              {fieldErrors.cpf === undefined ? (
+                <p className="error-message"></p>
               ) : (
-                <p className="error-message">
-                  {fieldErrors.cpf}
-                </p>
+                <p className="error-message">{fieldErrors.cpf}</p>
               )}
             </div>
           </div>
@@ -217,12 +210,9 @@ export function Register() {
                 {...register("cep")}
               />
               {fieldErrors.cep === undefined ? (
-                <p className="error-message">
-                </p>
+                <p className="error-message"></p>
               ) : (
-                <p className="error-message">
-                  {fieldErrors.cep}
-                </p>
+                <p className="error-message">{fieldErrors.cep}</p>
               )}
             </div>
             <div htmlFor="logradouro" class="content-input">
@@ -235,29 +225,25 @@ export function Register() {
                 {...register("logradouro")}
               />
               {fieldErrors.logradouro === undefined ? (
-                <p className="error-message">
-                </p>
+                <p className="error-message"></p>
               ) : (
-                <p className="error-message">
-                  {fieldErrors.logradouro}
-                </p>
+                <p className="error-message">{fieldErrors.logradouro}</p>
               )}
             </div>
             <div class="content-input">
               <label for="">Número</label>
               <input
-                className={fieldErrors.numeroLogradouro === undefined ? "" : "error"}
+                className={
+                  fieldErrors.numeroLogradouro === undefined ? "" : "error"
+                }
                 type="text"
                 placeholder="Número"
                 {...register("numeroLogradouro")}
               />
               {fieldErrors.numeroLogradouro === undefined ? (
-                <p className="error-message">
-                </p>
+                <p className="error-message"></p>
               ) : (
-                <p className="error-message">
-                  {fieldErrors.numeroLogradouro}
-                </p>
+                <p className="error-message">{fieldErrors.numeroLogradouro}</p>
               )}
             </div>
             <div class="content-input">
@@ -272,9 +258,7 @@ export function Register() {
               {fieldErrors.city === undefined ? (
                 <p className="error-message"></p>
               ) : (
-                <p className="error-message">
-                  {fieldErrors.city}
-                </p>
+                <p className="error-message">{fieldErrors.city}</p>
               )}
             </div>
 
@@ -290,9 +274,7 @@ export function Register() {
               {fieldErrors.uf === undefined ? (
                 <p className="error-message"></p>
               ) : (
-                <p className="error-message">
-                  {fieldErrors.uf}
-                </p>
+                <p className="error-message">{fieldErrors.uf}</p>
               )}
             </div>
             <div class="content-input">
@@ -314,7 +296,10 @@ export function Register() {
 
           <div className="terms">
             <label>Eu aceito todos os termos e condições</label>
-            <input type="checkbox" onChange={value => setVerifiedTerms(value.target.checked)} />
+            <input
+              type="checkbox"
+              onChange={(value) => setVerifiedTerms(value.target.checked)}
+            />
           </div>
 
           <button type="submit">Cadastrar</button>
