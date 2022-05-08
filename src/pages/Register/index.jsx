@@ -22,6 +22,7 @@ export function Register() {
     city:undefined,
     uf:undefined,
   });
+  const [verifiedTerms, setVerifiedTerms] = useState()
 
   // useEffect(() => {
   //   //seleciona o cep
@@ -62,34 +63,43 @@ export function Register() {
   //   });
   // }, []);
 
+  useEffect(() => {
+    console.log(verifiedTerms)
+  }, [verifiedTerms])
+  
+
   function handleSubmitForm(data) {
-    api.post("cadastro", data)
-      .then((response) => {
-        toast.success(response.data.message);
-    })
-    .catch((res) => {
-      let errors = {};
-      if (res.response.status === 422) {
-        setFieldErrors({
-          name: res.response.data.errors.nomeCompleto,
-          email: res.response.data.errors.email,
-          birth: res.response.data.errors.dataNascimento,
-          gender: res.response.data.errors.sexo,
-          cpf: res.response.data.errors.cpf,
-          cep: res.response.data.errors.cep,
-          logradouro: res.response.data.errors.logradouro,
-          numeroLogradouro: res.response.data.errors.numeroLogradouro,
-          city: res.response.data.errors.cidade,
-          uf: res.response.data.errors.uf,
-        })
-        toast.error("erro ao criar cadastro, verifique os campos!");
-        // Object.keys(res.response.data.errors).forEach((el) => {
-        //   errors = { ...errors, [el[0]]: [el[1]] };
-        // });
-      } else if (res.response.status === 412) {
-        toast.error(res.response.data.message);
-      }
-    });
+    if ( verifiedTerms ) {
+      api.post("cadastro", data)
+        .then((response) => {
+          toast.success(response.data.message);
+      })
+      .catch((res) => {
+        let errors = {};
+        if (res.response.status === 422) {
+          setFieldErrors({
+            name: res.response.data.errors.nomeCompleto,
+            email: res.response.data.errors.email,
+            birth: res.response.data.errors.dataNascimento,
+            gender: res.response.data.errors.sexo,
+            cpf: res.response.data.errors.cpf,
+            cep: res.response.data.errors.cep,
+            logradouro: res.response.data.errors.logradouro,
+            numeroLogradouro: res.response.data.errors.numeroLogradouro,
+            city: res.response.data.errors.cidade,
+            uf: res.response.data.errors.uf,
+          })
+          toast.error("erro ao criar cadastro, verifique os campos!");
+          // Object.keys(res.response.data.errors).forEach((el) => {
+          //   errors = { ...errors, [el[0]]: [el[1]] };
+          // });
+        } else if (res.response.status === 412) {
+          toast.error(res.response.data.message);
+        }
+      });
+    } else {
+      toast.error("marque o campo de termos e condições");
+    }
   }
 
   return (
@@ -304,7 +314,7 @@ export function Register() {
 
           <div className="terms">
             <label>Eu aceito todos os termos e condições</label>
-            <input type="checkbox" value={true} />
+            <input type="checkbox" onChange={value => setVerifiedTerms(value.target.checked)} />
           </div>
 
           <button type="submit">Cadastrar</button>
