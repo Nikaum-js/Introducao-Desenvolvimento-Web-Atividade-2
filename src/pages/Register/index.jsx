@@ -4,8 +4,24 @@ import api from "../../service/api";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import AttentionImg from "../../assets/attention.svg";
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 
 import "./styles.css";
+import { boolean } from "yup";
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 export function Register() {
   const { register, handleSubmit } = useForm();
@@ -22,6 +38,25 @@ export function Register() {
     uf: undefined,
   });
   const [verifiedTerms, setVerifiedTerms] = useState();
+
+  const [fieldValues, setFieldValues] = useState({
+    name: '',
+    email: '',
+    birth: '',
+    gender: '',
+    cep: '',
+    logradouro: '',
+    numeroLogradouro: '',
+    city: '',
+    uf: '',
+    isModifying: false,
+  });
+
+  const [open, setOpen] = useState(false);
+  const [cpfExist, setCpfExist] = useState(false);
+  const [cpf, setCpf] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   useEffect(() => {
     const cep = document.querySelector("#cep");
@@ -68,12 +103,12 @@ export function Register() {
   function handleSubmitForm(data) {
     if (verifiedTerms) {
       api
-        .post("cadastro", data)
+        .post("cadastro", fieldValues)
         .then((response) => {
           toast.success(response.data.message);
         })
         .catch((res) => {
-          if (res.response.status === 422) {
+          if (res.response.status === 422 && !cpfExist) {
             setFieldErrors({
               name: res.response.data.errors.nomeCompleto,
               email: res.response.data.errors.email,
@@ -108,6 +143,36 @@ export function Register() {
     }
   }
 
+  function handleVerifyCpf(value) {
+    // setCpf(value.target.value);
+    console.log(value.target.value)
+    if (value.target.value.length === 11)
+    // TODO: mudar para cpf dinamico
+      api.get(`cadastro/validar/documento/${value.target.value}`).then(res => {
+      }).catch(exception => {
+        console.log(`ta tentando pegar o status ${exception.status}`)
+        if (exception.status === 412)
+          console.log('ta batendo no 412')
+          setCpfExist(true)
+          setOpen(true)
+      })
+  }
+
+  function handleDeleteAccountByCpf(value) {
+    api.get(`cadastro/validar/documento/${value}`).then(res => {
+      if (res.status === 204)
+        console.log('ta batendo no 412')
+        toast.success('cadastro excluido com sucesso');
+    })
+  }
+
+  function handleModifyAccount() {
+    api.get('cadastro/00000000191').then(res => setFieldValues(res.data))
+  }
+
+  function setFieldValuesToModify() {
+  }
+
   return (
     <>
       <Header />
@@ -122,8 +187,10 @@ export function Register() {
               <input
                 className={fieldErrors.name === undefined ? "" : "error"}
                 type="text"
+                onChange={(value) => setFieldValues({...fieldValues, name: value.target.value})}
+                value={fieldValues.name}
                 placeholder="Nome Completo"
-                {...register("nomeCompleto")}
+                // {...register("nomeCompleto")}
               />
               {fieldErrors.name === undefined ? (
                 <p className="error-message"></p>
@@ -137,8 +204,10 @@ export function Register() {
               <input
                 className={fieldErrors.email === undefined ? "" : "error"}
                 type="text"
+                onChange={(value) => setFieldValues({...fieldValues, email: value.target.value})}
+                value={fieldValues.email}
                 placeholder="E-mail"
-                {...register("email")}
+                // {...register("email")}
               />
               {fieldErrors.email === undefined ? (
                 <p className="error-message"></p>
@@ -152,7 +221,9 @@ export function Register() {
               <input
                 className={fieldErrors.birth === undefined ? "" : "error"}
                 type="date"
-                {...register("dataNascimento")}
+                onChange={(value) => setFieldValues({...fieldValues, birth: value.target.value})}
+                value={fieldValues.birth}
+                // {...register("dataNascimento")}
               />
               {fieldErrors.birth === undefined ? (
                 <p className="error-message"></p>
@@ -186,10 +257,13 @@ export function Register() {
               <label for="">CPF</label>
               <input
                 className={fieldErrors.cpf === undefined ? "" : "error"}
-                type="number"
+                type="text"
                 placeholder="CPF"
+                onChange={(value) => setFieldValues({...fieldValues, cpf: value.target.value})}
+                value={fieldValues.cpf}
                 data-mask="000.000.000-00"
-                {...register("cpf")}
+                onChange={(value) => handleVerifyCpf(value)}
+                // {...register("cpf")}
               />
               {fieldErrors.cpf === undefined ? (
                 <p className="error-message"></p>
@@ -205,9 +279,11 @@ export function Register() {
               <input
                 id="cep"
                 className={fieldErrors.cep === undefined ? "" : "error"}
+                onChange={(value) => setFieldValues({...fieldValues, cep: value.target.value})}
+                value={fieldValues.cep}
                 type="text"
                 placeholder="CEP"
-                {...register("cep")}
+                // {...register("cep")}
               />
               {fieldErrors.cep === undefined ? (
                 <p className="error-message"></p>
@@ -220,9 +296,11 @@ export function Register() {
               <input
                 id="logradouro"
                 className={fieldErrors.logradouro === undefined ? "" : "error"}
+                onChange={(value) => setFieldValues({...fieldValues, logradouro: value.target.value})}
+                value={fieldErrors.logradouro}
                 type="text"
                 placeholder="Logradouro"
-                {...register("logradouro")}
+                // {...register("logradouro")}
               />
               {fieldErrors.logradouro === undefined ? (
                 <p className="error-message"></p>
@@ -236,9 +314,11 @@ export function Register() {
                 className={
                   fieldErrors.numeroLogradouro === undefined ? "" : "error"
                 }
+                onChange={(value) => setFieldValues({...fieldValues, numeroLogradouro: value.target.value})}
+                value={fieldErrors.numeroLogradouro}
                 type="text"
                 placeholder="Número"
-                {...register("numeroLogradouro")}
+                // {...register("numeroLogradouro")}
               />
               {fieldErrors.numeroLogradouro === undefined ? (
                 <p className="error-message"></p>
@@ -251,9 +331,12 @@ export function Register() {
               <input
                 id="localidade"
                 className={fieldErrors.city === undefined ? "" : "error"}
+                value={fieldErrors.city}
+                onChange={(value) => setFieldValues({...fieldValues, city: value.target.value})}
+
                 type="text"
                 placeholder="Cidade"
-                {...register("cidade")}
+                // {...register("cidade")}
               />
               {fieldErrors.city === undefined ? (
                 <p className="error-message"></p>
@@ -267,9 +350,11 @@ export function Register() {
               <input
                 id="uf"
                 className={fieldErrors.uf === undefined ? "" : "error"}
+                value={fieldErrors.uf}
                 type="text"
                 placeholder="UF"
-                {...register("uf")}
+                onChange={(value) => setFieldValues({...fieldValues, uf: value.target.value})}
+                // {...register("uf")}
               />
               {fieldErrors.uf === undefined ? (
                 <p className="error-message"></p>
@@ -305,6 +390,29 @@ export function Register() {
           <button type="submit">Cadastrar</button>
         </div>
       </form>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <h2>Já cadastrado!</h2>
+          <p>o documento digitado ja esta cadastrado</p>
+          <button style={{
+            width: '90px',
+            height: '40px',
+            backgroundColor: 'blue',
+            borderStyled: 'none',
+          }} onClick={() => setFieldValuesToModify()}>Modificar</button>
+          <button style={{
+            width: '90px',
+            height: '40px',
+            backgroundColor: 'red',
+            borderStyled: 'none',
+          }} onClick={() => handleDeleteAccountByCpf(fieldValues.cpf)}>Excluir</button>
+        </Box>
+      </Modal>
     </>
   );
 }
